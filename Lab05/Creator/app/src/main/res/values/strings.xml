@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Creator</string>
+    <string name="perm_label">CSEC 467 Service Creator Permission</string>
+    <string name="perm_desc">Permission to use service creator to start a toast</string>
+</resources>
