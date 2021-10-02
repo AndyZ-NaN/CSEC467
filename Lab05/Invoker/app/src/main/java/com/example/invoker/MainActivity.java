@@ -18,9 +18,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
 
+            // From the creator, latitude and longitude are sent back using an intent
             double[] coords = intent.getDoubleArrayExtra("coordinates");
             String coordinates = String.format("Lat: %.4f, Long: %.4f", coords[0], coords[1]);
-            //Log.i("test", coordinates);
             Toast.makeText(context, coordinates, Toast.LENGTH_LONG).show();
         }
     };
@@ -28,11 +28,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         IntentFilter filter = new IntentFilter("sendCoordinates");
+        IntentFilter filter2 = new IntentFilter("com.example.creator.action.getLocation");
         registerReceiver(br, filter);
         setContentView(R.layout.activity_main);
 
         Intent i = new Intent();
-        i.setComponent(new ComponentName("com.example.creator", "com.example.creator.Locator"));
+        i.setAction("com.example.creator.action.getLocation");
+        i.setComponent(new ComponentName("com.example.creator", "com.example.creator.IntentServiceLocator"));
 
         startService(i);
     }

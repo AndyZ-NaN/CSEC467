@@ -21,6 +21,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Creator">
         <service
+            android:name=".IntentServiceLocator"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="com.example.creator.permissions.perm" />
+        <service
             android:name=".Locator"
             android:enabled="true"
             android:exported="true"
