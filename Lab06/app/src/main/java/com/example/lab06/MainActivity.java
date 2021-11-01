@@ -54,9 +54,4 @@ public class MainActivity extends AppCompatActivity {
         Intent i = new Intent(v.getContext(), AccountReg.class);
         startActivity(i);
     }
-
-    public void getUsers(View V) {
-        AccountManager am = (AccountManager)getSystemService(ACCOUNT_SERVICE);
-        Account[] accounts = am.getAccountsByType("com.example.lab06.useracc");
-    }
 }

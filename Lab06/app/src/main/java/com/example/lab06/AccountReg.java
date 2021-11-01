@@ -39,14 +39,16 @@ public class AccountReg extends AppCompatActivity {
         EditText username = (EditText)findViewById(R.id.regEditUsername);
         EditText password = (EditText)findViewById(R.id.regEditPass);
 
+        String nameStr = username.getText().toString();
         // Username DNE, accept registration
-        if (!userExists(username.getText().toString())) {
+        if (!userExists(nameStr)) {
             AccountManager am = (AccountManager)getSystemService(ACCOUNT_SERVICE);
-            Account toBeAdded = new Account(username.getEditableText().toString(), "com.example.lab06.useracc");
+            Account toBeAdded = new Account(nameStr, "com.example.lab06.useracc");
             am.addAccountExplicitly(toBeAdded, password.getEditableText().toString(), null);
 
             // Create encryption key for the user
-            generateKey(username.getText().toString());
+            generateKey(nameStr);
+            Toast.makeText(getApplicationContext(), "User created! Default encryption key is: " + nameStr, Toast.LENGTH_LONG).show();
         } else { // Username exists, reject registration
             Toast.makeText(getApplicationContext(), "Username already exists.", Toast.LENGTH_LONG).show();
         }
@@ -75,13 +77,7 @@ public class AccountReg extends AppCompatActivity {
             ks.load(null);
             Enumeration<String> aliases = ks.aliases();
             Log.d("key", aliases.toString());
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (KeyStoreException e) {
+        } catch (CertificateException | IOException | NoSuchAlgorithmException | KeyStoreException e) {
             e.printStackTrace();
         }
         KeyGenParameterSpec keySpec = new KeyGenParameterSpec.Builder(alias, KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
@@ -92,9 +88,7 @@ public class AccountReg extends AppCompatActivity {
         KeyGenerator kg = null;
         try {
             kg = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
+        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
             e.printStackTrace();
         }
         try {
@@ -107,11 +101,7 @@ public class AccountReg extends AppCompatActivity {
         try {
             SecretKey k = ((KeyStore.SecretKeyEntry) ks.getEntry(alias, null)).getSecretKey();
             Log.d("key", k.toString());
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (UnrecoverableEntryException e) {
+        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableEntryException e) {
             e.printStackTrace();
         }
 

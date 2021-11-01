@@ -1,12 +1,14 @@
 package com.example.lab06;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.biometric.BiometricManager;
 import androidx.core.content.ContextCompat;
 import androidx.biometric.BiometricPrompt;
 import androidx.biometric.BiometricPrompt.PromptInfo;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
@@ -51,6 +53,7 @@ public class FileEncrypt extends AppCompatActivity {
         setContentView(R.layout.activity_file_encrypt);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.R)
     public void encrypt(View v){
         try {
             EditText edtFilename = (EditText)findViewById(R.id.edtFile);
@@ -96,28 +99,10 @@ public class FileEncrypt extends AppCompatActivity {
             }
             ivOut.close();
 
-
-            // Save IV to file
         } catch (UserNotAuthenticatedException e) {
             authenticate(v);
             encrypt(null);
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (UnrecoverableEntryException e) {
-            e.printStackTrace();
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
+        } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException | UnrecoverableEntryException | NoSuchPaddingException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
             e.printStackTrace();
         }
     }
@@ -162,36 +147,22 @@ public class FileEncrypt extends AppCompatActivity {
             Path p = Paths.get(path + File.separator + fileName);
             cipherText = Files.readAllBytes(p);
             byte[] plainText = c.doFinal(cipherText);
-            String readablePT = new String(plainText, "UTF-8");
+            String readablePT = new String(plainText, StandardCharsets.UTF_8);
             edtData.setText(readablePT);
             Toast.makeText(this, readablePT, Toast.LENGTH_SHORT).show();
 
         } catch (UserNotAuthenticatedException e) {
             authenticate(v);
             decrypt(null);
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (UnrecoverableEntryException e) {
-            e.printStackTrace();
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InvalidAlgorithmParameterException e) {
+        } catch (InvalidKeyException | UnrecoverableEntryException | KeyStoreException | NoSuchAlgorithmException | CertificateException | IllegalBlockSizeException | BadPaddingException | NoSuchPaddingException | IOException | InvalidAlgorithmParameterException e) {
             e.printStackTrace();
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.R)
+    public void newKey(View v) {
+        EditText edtAlias = (EditText) findViewById(R.id.edtAlias);
+        generateKey(edtAlias.getText().toString());
     }
 
     private void authenticate(View v){
@@ -226,7 +197,8 @@ public class FileEncrypt extends AppCompatActivity {
         prompt.authenticate(details);
     }
 
-    private void generateKey(String alias) {
+    @RequiresApi(api = Build.VERSION_CODES.R)
+    private void generateKey(String alias) throws NoSuchAlgorithmException {
         KeyStore ks = null;
         try {
             ks = KeyStore.getInstance("AndroidKeyStore");
@@ -237,27 +209,20 @@ public class FileEncrypt extends AppCompatActivity {
             ks.load(null);
             Enumeration<String> aliases = ks.aliases();
             Log.d("key", aliases.toString());
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (KeyStoreException e) {
+        } catch (CertificateException | IOException | KeyStoreException e) {
             e.printStackTrace();
         }
         KeyGenParameterSpec keySpec = new KeyGenParameterSpec.Builder(alias, KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
                 .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
                 .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
                 .setUserAuthenticationRequired(true)
+                .setUserAuthenticationParameters(120, KeyProperties.AUTH_DEVICE_CREDENTIAL)
                 .setKeySize(128)
                 .build();
         KeyGenerator kg = null;
         try {
             kg = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
+        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
             e.printStackTrace();
         }
         try {
