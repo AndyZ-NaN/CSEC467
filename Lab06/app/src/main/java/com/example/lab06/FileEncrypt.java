@@ -162,7 +162,11 @@ public class FileEncrypt extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.R)
     public void newKey(View v) {
         EditText edtAlias = (EditText) findViewById(R.id.edtAlias);
-        generateKey(edtAlias.getText().toString());
+        try {
+            generateKey(edtAlias.getText().toString());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
     }
 
     private void authenticate(View v){

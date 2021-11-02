@@ -49,6 +49,8 @@ public class AccountReg extends AppCompatActivity {
             // Create encryption key for the user
             generateKey(nameStr);
             Toast.makeText(getApplicationContext(), "User created! Default encryption key is: " + nameStr, Toast.LENGTH_LONG).show();
+            Intent i = new Intent(v.getContext(), FileEncrypt.class);
+            startActivity(i);
         } else { // Username exists, reject registration
             Toast.makeText(getApplicationContext(), "Username already exists.", Toast.LENGTH_LONG).show();
         }
